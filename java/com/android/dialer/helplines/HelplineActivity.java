@@ -49,7 +49,7 @@ import com.android.dialer.app.BaseActivity;
 import com.android.dialer.app.calllog.IntentProvider;
 import com.android.dialer.helplines.utils.HelplineUtils;
 
-import org.lineageos.lib.phone.spn.Item;
+import org.extdev.lib.phone.spn.Item;
 
 import java.util.HashMap;
 import java.util.List;

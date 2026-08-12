@@ -21,7 +21,7 @@ import android.text.TextUtils;
 import com.android.dialer.R;
 import com.android.dialer.helplines.HelplineItem;
 
-import org.lineageos.lib.phone.spn.Item;
+import org.extdev.lib.phone.spn.Item;
 
 import java.util.ArrayList;
 
