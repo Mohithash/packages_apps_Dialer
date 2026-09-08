@@ -324,6 +324,14 @@ public class CallButtonPresenter
     }
   }
 
+  @Override
+  public void noteClicked() {
+    if (call == null) {
+      return;
+    }
+    inCallButtonUi.showCallNoteUi(call.getNumber(), call.getCreationTimeMillis());
+  }
+
   private void startCallRecordingOrAskForPermission() {
     if (hasAllPermissions(CallRecorder.REQUIRED_PERMISSIONS)) {
       CallRecorder recorder = CallRecorder.getInstance();
@@ -536,6 +544,12 @@ public class CallButtonPresenter
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_DIALPAD, true);
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_MERGE, showMerge);
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_RECORD_CALL, showCallRecordOption);
+
+    // A note is about who you were talking to, so it is pointless on an emergency call, and the
+    // store is credential-encrypted, so it cannot be written before the first unlock.
+    boolean showNote = !call.isEmergencyCall() && UserManagerCompat.isUserUnlocked(context);
+    inCallButtonUi.showButton(InCallButtonIds.BUTTON_NOTE, showNote);
+    inCallButtonUi.enableButton(InCallButtonIds.BUTTON_NOTE, showNote);
 
     inCallButtonUi.updateButtonStates();
   }

@@ -575,6 +575,24 @@ interface ButtonController {
     }
   }
 
+  class NoteButtonController extends SimpleNonCheckableButtonController {
+
+    public NoteButtonController(@NonNull InCallButtonUiDelegate delegate) {
+      super(
+          delegate,
+          InCallButtonIds.BUTTON_NOTE,
+          R.string.incall_content_description_note,
+          R.string.incall_label_note,
+          R.drawable.quantum_ic_edit_vd_theme_24);
+      Assert.isNotNull(delegate);
+    }
+
+    @Override
+    public void onClick(View view) {
+      delegate.noteClicked();
+    }
+  }
+
   class SwapButtonController extends SimpleNonCheckableButtonController {
 
     public SwapButtonController(@NonNull InCallButtonUiDelegate delegate) {

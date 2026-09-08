@@ -47,6 +47,7 @@ final class CallDetailsAdapter extends CallDetailsAdapterCommon {
       CallDetailsHeaderListener callDetailsHeaderListener,
       CallDetailsFooterViewHolder.ReportCallIdListener reportCallIdListener,
       DeleteCallDetailsListener deleteCallDetailsListener,
+      CallNoteViewHolder.CallNoteListener callNoteListener,
       CallRecordingDataStore callRecordingDataStore) {
     super(
         context,
@@ -55,6 +56,7 @@ final class CallDetailsAdapter extends CallDetailsAdapterCommon {
         callDetailsHeaderListener,
         reportCallIdListener,
         deleteCallDetailsListener,
+        callNoteListener,
         callRecordingDataStore);
     this.headerInfo = calldetailsHeaderInfo;
   }

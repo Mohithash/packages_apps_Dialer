@@ -53,6 +53,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
 import com.android.dialer.R;
+import com.android.dialer.callnote.CallNoteDialogFragment;
 import com.android.dialer.common.Assert;
 import com.android.dialer.common.FragmentUtils;
 import com.android.dialer.common.LogUtil;
@@ -153,7 +154,8 @@ public class InCallFragment extends Fragment
         || id == InCallButtonIds.BUTTON_MANAGE_VOICE_CONFERENCE
         || id == InCallButtonIds.BUTTON_SWAP_SIM
         || id == InCallButtonIds.BUTTON_UPGRADE_TO_RTT
-        || id == InCallButtonIds.BUTTON_RECORD_CALL;
+        || id == InCallButtonIds.BUTTON_RECORD_CALL
+        || id == InCallButtonIds.BUTTON_NOTE;
   }
 
   @Override
@@ -277,6 +279,7 @@ public class InCallFragment extends Fragment
     buttonControllers.add(
         new ButtonController.SwitchToSecondaryButtonController(inCallScreenDelegate));
     buttonControllers.add(new ButtonController.CallRecordButtonController(inCallButtonUiDelegate));
+    buttonControllers.add(new ButtonController.NoteButtonController(inCallButtonUiDelegate));
 
     inCallScreenDelegate.onInCallScreenDelegateInit(this);
     inCallScreenDelegate.onInCallScreenReady();
@@ -554,6 +557,15 @@ public class InCallFragment extends Fragment
     } else {
       bluetoothPermissionLauncher.launch(permissions);
     }
+  }
+
+  @Override
+  public void showCallNoteUi(String phoneNumber, long callCreationTimeMillis) {
+    // The key is the call's creation time, which is what Telecom writes to CallLog.Calls.DATE, so
+    // the note written here is the one the call log shows afterwards.
+    CallNoteDialogFragment.newInstance(
+            String.valueOf(callCreationTimeMillis), phoneNumber, /* note = */ null)
+        .show(getChildFragmentManager(), "call_note");
   }
 
   private boolean hasAllPermissions(String[] permissions) {

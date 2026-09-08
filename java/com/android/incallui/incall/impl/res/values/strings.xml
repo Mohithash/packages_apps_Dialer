@@ -69,4 +69,9 @@
        [CHAR LIMIT=32] -->
   <string name="incall_note_sent">Note sent</string>
 
+  <!-- Button shown during a call for writing a note about that call. [CHAR LIMIT=12] -->
+  <string name="incall_label_note">Note</string>
+
+  <!-- Content description of the note button shown during a call. [CHAR LIMIT=NONE] -->
+  <string name="incall_content_description_note">Write a note for this call</string>
 </resources>

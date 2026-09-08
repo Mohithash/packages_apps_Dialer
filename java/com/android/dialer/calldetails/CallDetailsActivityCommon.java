@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.CallSuper;
@@ -43,6 +44,8 @@ import com.android.dialer.callintent.CallInitiationType;
 import com.android.dialer.callintent.CallIntentBuilder;
 import com.android.dialer.callrecord.CallRecordingDataStore;
 import com.android.dialer.common.Assert;
+import com.android.dialer.callnote.CallNoteDialogFragment;
+import com.android.dialer.callnote.CallNoteUtil;
 import com.android.dialer.common.LogUtil;
 import com.android.dialer.common.concurrent.DialerExecutor.FailureListener;
 import com.android.dialer.common.concurrent.DialerExecutor.SuccessListener;
@@ -71,7 +74,8 @@ import java.util.List;
  * Contains common logic shared between {@link OldCallDetailsActivity} and {@link
  * CallDetailsActivity}.
  */
-abstract class CallDetailsActivityCommon extends BaseActivity {
+abstract class CallDetailsActivityCommon extends BaseActivity
+    implements CallNoteDialogFragment.CallNoteSavedListener {
 
   public static final String EXTRA_PHONE_NUMBER = "phone_number";
   public static final String EXTRA_CAN_REPORT_CALLER_ID = "can_report_caller_id";
@@ -85,10 +89,12 @@ abstract class CallDetailsActivityCommon extends BaseActivity {
       new DeleteCallDetailsListener(this);
   private final CallDetailsFooterViewHolder.ReportCallIdListener reportCallIdListener =
       new ReportCallIdListener(this);
+  private final CallNoteViewHolder.CallNoteListener callNoteListener = new CallNoteListener(this);
 
   private CallDetailsAdapterCommon adapter;
   private CallDetailsEntries callDetailsEntries;
   private SupportUiListener<ImmutableSet<String>> checkRttTranscriptAvailabilityListener;
+  private SupportUiListener<String> loadCallNoteListener;
   private CallRecordingDataStore callRecordingDataStore;
 
   /**
@@ -103,6 +109,7 @@ abstract class CallDetailsActivityCommon extends BaseActivity {
       CallDetailsHeaderViewHolder.CallDetailsHeaderListener callDetailsHeaderListener,
       CallDetailsFooterViewHolder.ReportCallIdListener reportCallIdListener,
       CallDetailsFooterViewHolder.DeleteCallDetailsListener deleteCallDetailsListener,
+      CallNoteViewHolder.CallNoteListener callNoteListener,
       CallRecordingDataStore callRecordingDataStore);
 
   /** Returns the phone number of the call details. */
@@ -121,6 +128,9 @@ abstract class CallDetailsActivityCommon extends BaseActivity {
     checkRttTranscriptAvailabilityListener =
         DialerExecutorComponent.get(this)
             .createUiListener(getSupportFragmentManager(), "Query RTT transcript availability");
+    loadCallNoteListener =
+        DialerExecutorComponent.get(this)
+            .createUiListener(getSupportFragmentManager(), "Load call note");
     callRecordingDataStore = new CallRecordingDataStore();
     handleIntent(getIntent());
     setupRecyclerViewForEntries();
@@ -187,11 +197,31 @@ abstract class CallDetailsActivityCommon extends BaseActivity {
             callDetailsHeaderListener,
             reportCallIdListener,
             deleteCallDetailsListener,
+            callNoteListener,
             callRecordingDataStore);
 
     RecyclerView recyclerView = findViewById(R.id.recycler_view);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     recyclerView.setAdapter(adapter);
+    loadCallNote();
+  }
+
+  @Override
+  public void onCallNoteSaved(String callNoteId, String note) {
+    adapter.updateCallNote(note);
+  }
+
+  /** Reads the note of these calls and hands it to the adapter. */
+  private void loadCallNote() {
+    String callNoteId = adapter.getCallNoteId();
+    if (callNoteId == null) {
+      return;
+    }
+    loadCallNoteListener.listen(
+        this,
+        CallNoteUtil.loadNote(this, callNoteId),
+        note -> adapter.updateCallNote(note),
+        throwable -> LogUtil.e("CallDetailsActivityCommon.loadCallNote", "failed", throwable));
   }
 
   final CallDetailsAdapterCommon getAdapter() {
@@ -242,6 +272,16 @@ abstract class CallDetailsActivityCommon extends BaseActivity {
       context
           .getContentResolver()
           .notifyChange(Calls.CONTENT_URI, null);
+
+      // The note lives in our own table, which the call log provider knows nothing about.
+      ImmutableSet.Builder<String> noteIds = ImmutableSet.builder();
+      for (CallDetailsEntry entry : callDetailsEntries.getEntriesList()) {
+        noteIds.add(
+            TextUtils.isEmpty(entry.getCallMappingId())
+                ? String.valueOf(entry.getDate())
+                : entry.getCallMappingId());
+      }
+      CallNoteUtil.deleteNotesBlocking(context, noteIds.build());
       return null;
     }
 
@@ -271,6 +311,25 @@ abstract class CallDetailsActivityCommon extends BaseActivity {
       getActivity()
           .startActivity(
               RttTranscriptActivity.getIntent(getActivity(), transcriptId, primaryText, photoInfo));
+    }
+
+    private CallDetailsActivityCommon getActivity() {
+      return Preconditions.checkNotNull(activityWeakReference.get());
+    }
+  }
+
+  private static final class CallNoteListener implements CallNoteViewHolder.CallNoteListener {
+    private final WeakReference<CallDetailsActivityCommon> activityWeakReference;
+
+    CallNoteListener(CallDetailsActivityCommon activity) {
+      this.activityWeakReference = new WeakReference<>(activity);
+    }
+
+    @Override
+    public void editCallNote(String callNoteId, String currentNote) {
+      CallDetailsActivityCommon activity = getActivity();
+      CallNoteDialogFragment.newInstance(callNoteId, activity.getNumber(), currentNote)
+          .show(activity.getSupportFragmentManager(), "call_note");
     }
 
     private CallDetailsActivityCommon getActivity() {

@@ -49,6 +49,7 @@ final class OldCallDetailsAdapter extends CallDetailsAdapterCommon {
       CallDetailsHeaderListener callDetailsHeaderListener,
       CallDetailsFooterViewHolder.ReportCallIdListener reportCallIdListener,
       DeleteCallDetailsListener deleteCallDetailsListener,
+      CallNoteViewHolder.CallNoteListener callNoteListener,
       CallRecordingDataStore callRecordingDataStore) {
     super(
         context,
@@ -57,6 +58,7 @@ final class OldCallDetailsAdapter extends CallDetailsAdapterCommon {
         callDetailsHeaderListener,
         reportCallIdListener,
         deleteCallDetailsListener,
+        callNoteListener,
         callRecordingDataStore);
     this.contact = contact;
   }
