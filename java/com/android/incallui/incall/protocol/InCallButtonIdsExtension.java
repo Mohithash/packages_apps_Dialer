@@ -60,6 +60,8 @@ public class InCallButtonIdsExtension {
       return "UPGRADE_TO_RTT";
     } else if (id == InCallButtonIds.BUTTON_RECORD_CALL) {
       return "RECORD_CALL";
+    } else if (id == InCallButtonIds.BUTTON_NOTE) {
+      return "NOTE";
     } else {
       return "INVALID_BUTTON: " + id;
     }

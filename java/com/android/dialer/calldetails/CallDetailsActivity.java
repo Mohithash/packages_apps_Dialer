@@ -96,6 +96,7 @@ public final class CallDetailsActivity extends CallDetailsActivityCommon {
       CallDetailsHeaderListener callDetailsHeaderListener,
       ReportCallIdListener reportCallIdListener,
       DeleteCallDetailsListener deleteCallDetailsListener,
+      CallNoteViewHolder.CallNoteListener callNoteListener,
       CallRecordingDataStore callRecordingDataStore) {
     return new CallDetailsAdapter(
         this,
@@ -105,6 +106,7 @@ public final class CallDetailsActivity extends CallDetailsActivityCommon {
         callDetailsHeaderListener,
         reportCallIdListener,
         deleteCallDetailsListener,
+        callNoteListener,
         callRecordingDataStore);
   }
 

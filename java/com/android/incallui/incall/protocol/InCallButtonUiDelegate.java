@@ -63,5 +63,7 @@ public interface InCallButtonUiDelegate {
 
   default void callRecordClicked(boolean checked) {}
 
+  default void noteClicked() {}
+
   Context getContext();
 }

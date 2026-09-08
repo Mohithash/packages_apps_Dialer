@@ -84,6 +84,7 @@ public final class OldCallDetailsActivity extends CallDetailsActivityCommon {
       CallDetailsHeaderListener callDetailsHeaderListener,
       ReportCallIdListener reportCallIdListener,
       DeleteCallDetailsListener deleteCallDetailsListener,
+      CallNoteViewHolder.CallNoteListener callNoteListener,
       CallRecordingDataStore callRecordingDataStore) {
     return new OldCallDetailsAdapter(
         /* context = */ this,
@@ -93,6 +94,7 @@ public final class OldCallDetailsActivity extends CallDetailsActivityCommon {
         callDetailsHeaderListener,
         reportCallIdListener,
         deleteCallDetailsListener,
+        callNoteListener,
         callRecordingDataStore);
   }
 

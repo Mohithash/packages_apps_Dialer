@@ -53,4 +53,7 @@ public interface InCallButtonUi {
   Fragment getInCallButtonUiFragment();
 
   void showAudioRouteSelector();
+
+  /** Opens the editor for the note attached to the call in progress. */
+  default void showCallNoteUi(String phoneNumber, long callCreationTimeMillis) {}
 }

@@ -18,6 +18,7 @@
 package com.android.dialer.calldetails;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import com.android.dialer.calldetails.CallDetailsEntryViewHolder.CallDetailsEntr
 import com.android.dialer.calldetails.CallDetailsFooterViewHolder.DeleteCallDetailsListener;
 import com.android.dialer.calldetails.CallDetailsFooterViewHolder.ReportCallIdListener;
 import com.android.dialer.calldetails.CallDetailsHeaderViewHolder.CallDetailsHeaderListener;
+import com.android.dialer.calldetails.CallNoteViewHolder.CallNoteListener;
 import com.android.dialer.calllogutils.CallTypeHelper;
 import com.android.dialer.calllogutils.CallbackActionHelper;
 import com.android.dialer.calllogutils.CallbackActionHelper.CallbackAction;
@@ -49,15 +51,21 @@ abstract class CallDetailsAdapterCommon extends RecyclerView.Adapter<RecyclerVie
   private static final int HEADER_VIEW_TYPE = 1;
   private static final int CALL_ENTRY_VIEW_TYPE = 2;
   private static final int FOOTER_VIEW_TYPE = 3;
+  private static final int NOTE_VIEW_TYPE = 4;
+
+  /** Position of the note, directly below the header. */
+  private static final int NOTE_POSITION = 1;
 
   private final CallDetailsEntryListener callDetailsEntryListener;
   private final CallDetailsHeaderListener callDetailsHeaderListener;
   private final ReportCallIdListener reportCallIdListener;
   private final DeleteCallDetailsListener deleteCallDetailsListener;
+  private final CallNoteListener callNoteListener;
   private final CallTypeHelper callTypeHelper;
   private final CallRecordingDataStore callRecordingDataStore;
 
   private CallDetailsEntries callDetailsEntries;
+  private String callNote;
 
   protected abstract void bindCallDetailsHeaderViewHolder(
       CallDetailsHeaderViewHolder viewHolder, int position);
@@ -81,12 +89,14 @@ abstract class CallDetailsAdapterCommon extends RecyclerView.Adapter<RecyclerVie
       CallDetailsHeaderListener callDetailsHeaderListener,
       ReportCallIdListener reportCallIdListener,
       DeleteCallDetailsListener deleteCallDetailsListener,
+      CallNoteListener callNoteListener,
       CallRecordingDataStore callRecordingDataStore) {
     this.callDetailsEntries = callDetailsEntries;
     this.callDetailsEntryListener = callDetailsEntryListener;
     this.callDetailsHeaderListener = callDetailsHeaderListener;
     this.reportCallIdListener = reportCallIdListener;
     this.deleteCallDetailsListener = deleteCallDetailsListener;
+    this.callNoteListener = callNoteListener;
     this.callRecordingDataStore = callRecordingDataStore;
     this.callTypeHelper = new CallTypeHelper(context.getResources());
   }
@@ -107,6 +117,9 @@ abstract class CallDetailsAdapterCommon extends RecyclerView.Adapter<RecyclerVie
             inflater.inflate(R.layout.call_details_footer, parent, false),
             reportCallIdListener,
             deleteCallDetailsListener);
+      case NOTE_VIEW_TYPE:
+        return new CallNoteViewHolder(
+            inflater.inflate(R.layout.call_details_note, parent, false), callNoteListener);
       default:
         throw Assert.createIllegalStateFailException(
             "No ViewHolder available for viewType: " + viewType);
@@ -118,11 +131,13 @@ abstract class CallDetailsAdapterCommon extends RecyclerView.Adapter<RecyclerVie
   public void onBindViewHolder(ViewHolder holder, int position) {
     if (position == 0) { // Header
       bindCallDetailsHeaderViewHolder((CallDetailsHeaderViewHolder) holder, position);
+    } else if (position == NOTE_POSITION) {
+      ((CallNoteViewHolder) holder).setNote(getCallNoteId(), callNote);
     } else if (position == getItemCount() - 1) {
       ((CallDetailsFooterViewHolder) holder).setPhoneNumber(getNumber());
     } else {
       CallDetailsEntryViewHolder viewHolder = (CallDetailsEntryViewHolder) holder;
-      CallDetailsEntry entry = callDetailsEntries.getEntries(position - 1);
+      CallDetailsEntry entry = callDetailsEntries.getEntries(position - 2);
       viewHolder.setCallDetails(
           getNumber(),
           getPrimaryText(),
@@ -138,6 +153,8 @@ abstract class CallDetailsAdapterCommon extends RecyclerView.Adapter<RecyclerVie
   public int getItemViewType(int position) {
     if (position == 0) { // Header
       return HEADER_VIEW_TYPE;
+    } else if (position == NOTE_POSITION) {
+      return NOTE_VIEW_TYPE;
     } else if (position == getItemCount() - 1) {
       return FOOTER_VIEW_TYPE;
     } else {
@@ -150,11 +167,36 @@ abstract class CallDetailsAdapterCommon extends RecyclerView.Adapter<RecyclerVie
   public int getItemCount() {
     return callDetailsEntries.getEntriesCount() == 0
         ? 0
-        : callDetailsEntries.getEntriesCount() + 2; // plus header and footer
+        : callDetailsEntries.getEntriesCount() + 3; // plus header, note and footer
   }
 
   final CallDetailsEntries getCallDetailsEntries() {
     return callDetailsEntries;
+  }
+
+  /**
+   * Returns the key the note of these calls is stored under.
+   *
+   * <p>All the entries on this screen are calls with the same number, and the note belongs to the
+   * most recent of them, which is the first entry.
+   */
+  final String getCallNoteId() {
+    if (callDetailsEntries.getEntriesCount() == 0) {
+      return null;
+    }
+    CallDetailsEntry entry = callDetailsEntries.getEntries(0);
+    return TextUtils.isEmpty(entry.getCallMappingId())
+        ? String.valueOf(entry.getDate())
+        : entry.getCallMappingId();
+  }
+
+  @MainThread
+  final void updateCallNote(String note) {
+    Assert.isMainThread();
+    callNote = note;
+    if (getItemCount() > NOTE_POSITION) {
+      notifyItemChanged(NOTE_POSITION);
+    }
   }
 
   @MainThread

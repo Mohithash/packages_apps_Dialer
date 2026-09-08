@@ -52,4 +52,16 @@
 
   <!-- String shown when RTT transcript is available. [CHAR LIMIT=NONE] -->
   <string name="rtt_transcript_link">See transcript</string>
+
+  <!-- Shown in call details when the call has no note yet; tapping it adds one. [CHAR LIMIT=40] -->
+  <string name="call_details_add_note">Add note</string>
+
+  <!-- Title of the dialog for writing the note attached to a call. [CHAR LIMIT=40] -->
+  <string name="call_details_note_title">Call note</string>
+
+  <!-- Placeholder inside the empty note editor. [CHAR LIMIT=60] -->
+  <string name="call_details_note_hint">Note for this call</string>
+
+  <!-- Button that saves the note being edited. [CHAR LIMIT=20] -->
+  <string name="call_details_note_save">Save</string>
 </resources>
