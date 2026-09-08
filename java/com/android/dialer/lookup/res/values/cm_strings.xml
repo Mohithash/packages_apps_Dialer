@@ -29,4 +29,24 @@
 
     <!-- Disclaimer -->
     <string name="lookup_disclaimer">Lookups may send queries over a secure protocol (https) to remote websites to gather information. The query may include the other party\'s phone number or the search query</string>
+
+    <!-- Title of the setting holding the address of the user's own caller ID service. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_url_title">Endpoint</string>
+    <!-- Explains what to type as the endpoint address. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_url_dialog">The https address to ask, with {number} where the number goes. Use {number_plain} for the number without its leading +.</string>
+
+    <!-- Title of the setting naming where the name sits in the reply. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_name_path_title">Name field</string>
+    <!-- Explains how to point at the name in the reply. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_name_path_dialog">Where the name sits in the reply, as a dotted path: name, or data.name, or data.0.name for the first entry of a list.</string>
+
+    <!-- Title of the setting holding the name of the header the lookup sends. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_header_name_title">Header name</string>
+    <!-- Explains the header name setting. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_header_name_dialog">The header your service wants, if it needs one. Often Authorization or X-API-Key. Leave empty for none.</string>
+
+    <!-- Title of the setting holding the credential sent with the lookup. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_header_value_title">Header value</string>
+    <!-- Explains the header value setting. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_header_value_dialog">The value for that header. This is your own credential for that service and stays on this phone.</string>
 </resources>

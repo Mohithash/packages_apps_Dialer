@@ -28,6 +28,7 @@
         <item>YellowPages</item>
         <item>YellowPages_CA</item>
         <item>ZabaSearch</item>
+        <item>Custom</item>
     </string-array>
 
     <string-array name="reverse_lookup_provider_names" translatable="false">
@@ -35,5 +36,6 @@
         <item>YellowPages (US)</item>
         <item>YellowPages (CA)</item>
         <item>ZabaSearch (US)</item>
+        <item>Custom endpoint</item>
     </string-array>
 </resources>
