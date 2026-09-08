@@ -32,6 +32,7 @@ public final class LookupSettings {
   public static final String RLP_ZABASEARCH = "ZabaSearch";
   public static final String RLP_CYNGN_CHINESE = "CyngnChinese";
   public static final String RLP_DASTELEFONBUCH = "DasTelefonbuch";
+  public static final String RLP_CUSTOM = "Custom";
   public static final String RLP_DEFAULT = RLP_YELLOWPAGES;
 
   /** Preferences */
@@ -40,6 +41,10 @@ public final class LookupSettings {
   private static final String ENABLE_REVERSE_LOOKUP = "enable_reverse_lookup";
   private static final String FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider2";
   private static final String REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider2";
+  private static final String CUSTOM_LOOKUP_URL = "custom_lookup_url";
+  private static final String CUSTOM_LOOKUP_HEADER_NAME = "custom_lookup_header_name";
+  private static final String CUSTOM_LOOKUP_HEADER_VALUE = "custom_lookup_header_value";
+  private static final String CUSTOM_LOOKUP_NAME_PATH = "custom_lookup_name_path";
 
   private LookupSettings() {
   }
@@ -79,5 +84,49 @@ public final class LookupSettings {
 
   public static void setReverseLookupProvider(Context context, String value) {
     getSharedPreferences(context).edit().putString(REVERSE_LOOKUP_PROVIDER, value).apply();
+  }
+
+  /**
+   * The endpoint the custom reverse lookup provider queries.
+   *
+   * <p>{@code {number}} in it is replaced with the number in E.164 form, {@code {number_plain}}
+   * with the same without the leading "+". BestROM ships no default: the user names the service.
+   */
+  public static String getCustomLookupUrl(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_URL, null);
+  }
+
+  public static void setCustomLookupUrl(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_URL, value).apply();
+  }
+
+  /** Name of the one header the custom lookup sends, e.g. "Authorization". */
+  public static String getCustomLookupHeaderName(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_HEADER_NAME, null);
+  }
+
+  public static void setCustomLookupHeaderName(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_HEADER_NAME, value).apply();
+  }
+
+  /** Value of that header, e.g. "Bearer ...". This is the user's own credential. */
+  public static String getCustomLookupHeaderValue(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_HEADER_VALUE, null);
+  }
+
+  public static void setCustomLookupHeaderValue(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_HEADER_VALUE, value).apply();
+  }
+
+  /**
+   * Dotted path to the caller's name in the reply, e.g. {@code name}, {@code data.name} or {@code
+   * data.0.name}. A numeric segment indexes an array.
+   */
+  public static String getCustomLookupNamePath(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_NAME_PATH, "name");
+  }
+
+  public static void setCustomLookupNamePath(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_NAME_PATH, value).apply();
   }
 }

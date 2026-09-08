@@ -53,6 +53,37 @@
         android:title="@string/reverse_lookup_provider_title"
         app:iconSpaceReserved="false" />
 
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_url"
+        android:persistent="false"
+        android:title="@string/custom_lookup_url_title"
+        android:dialogMessage="@string/custom_lookup_url_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_name_path"
+        android:persistent="false"
+        android:title="@string/custom_lookup_name_path_title"
+        android:dialogMessage="@string/custom_lookup_name_path_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_header_name"
+        android:persistent="false"
+        android:title="@string/custom_lookup_header_name_title"
+        android:dialogMessage="@string/custom_lookup_header_name_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_header_value"
+        android:persistent="false"
+        android:title="@string/custom_lookup_header_value_title"
+        android:dialogMessage="@string/custom_lookup_header_value_dialog"
+        app:iconSpaceReserved="false" />
     <Preference
         android:summary="@string/lookup_disclaimer"
         app:iconSpaceReserved="false" />

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -35,11 +36,19 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
   private static final String KEY_ENABLE_REVERSE_LOOKUP = "enable_reverse_lookup";
   private static final String KEY_FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider";
   private static final String KEY_REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider";
+  private static final String KEY_CUSTOM_LOOKUP_URL = "custom_lookup_url";
+  private static final String KEY_CUSTOM_LOOKUP_NAME_PATH = "custom_lookup_name_path";
+  private static final String KEY_CUSTOM_LOOKUP_HEADER_NAME = "custom_lookup_header_name";
+  private static final String KEY_CUSTOM_LOOKUP_HEADER_VALUE = "custom_lookup_header_value";
 
   private SwitchPreferenceCompat enableForwardLookup;
   private SwitchPreferenceCompat enableReverseLookup;
   private ListPreference forwardLookupProvider;
   private ListPreference reverseLookupProvider;
+  private EditTextPreference customLookupUrl;
+  private EditTextPreference customLookupNamePath;
+  private EditTextPreference customLookupHeaderName;
+  private EditTextPreference customLookupHeaderValue;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +71,15 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
 
     forwardLookupProvider.setOnPreferenceChangeListener(this);
     reverseLookupProvider.setOnPreferenceChangeListener(this);
+
+    customLookupUrl = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_URL);
+    customLookupNamePath = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_NAME_PATH);
+    customLookupHeaderName = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_HEADER_NAME);
+    customLookupHeaderValue = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_HEADER_VALUE);
+    customLookupUrl.setOnPreferenceChangeListener(this);
+    customLookupNamePath.setOnPreferenceChangeListener(this);
+    customLookupHeaderName.setOnPreferenceChangeListener(this);
+    customLookupHeaderValue.setOnPreferenceChangeListener(this);
   }
 
   @Override
@@ -70,6 +88,7 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
 
     restoreLookupProviderSwitches();
     restoreLookupProviders();
+    restoreCustomLookupSettings();
   }
 
   @Override
@@ -84,9 +103,36 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
       LookupSettings.setForwardLookupProvider(context, (String) newValue);
     } else if (preference == reverseLookupProvider) {
       LookupSettings.setReverseLookupProvider(context, (String) newValue);
+      showCustomLookupSettings(LookupSettings.RLP_CUSTOM.equals(newValue));
+    } else if (preference == customLookupUrl) {
+      LookupSettings.setCustomLookupUrl(context, (String) newValue);
+    } else if (preference == customLookupNamePath) {
+      LookupSettings.setCustomLookupNamePath(context, (String) newValue);
+    } else if (preference == customLookupHeaderName) {
+      LookupSettings.setCustomLookupHeaderName(context, (String) newValue);
+    } else if (preference == customLookupHeaderValue) {
+      LookupSettings.setCustomLookupHeaderValue(context, (String) newValue);
     }
 
     return true;
+  }
+
+  private void restoreCustomLookupSettings() {
+    Context context = getContext();
+    customLookupUrl.setText(LookupSettings.getCustomLookupUrl(context));
+    customLookupNamePath.setText(LookupSettings.getCustomLookupNamePath(context));
+    customLookupHeaderName.setText(LookupSettings.getCustomLookupHeaderName(context));
+    customLookupHeaderValue.setText(LookupSettings.getCustomLookupHeaderValue(context));
+    showCustomLookupSettings(
+        LookupSettings.RLP_CUSTOM.equals(LookupSettings.getReverseLookupProvider(context)));
+  }
+
+  /** The endpoint settings mean nothing unless the custom provider is the one selected. */
+  private void showCustomLookupSettings(boolean visible) {
+    customLookupUrl.setVisible(visible);
+    customLookupNamePath.setVisible(visible);
+    customLookupHeaderName.setVisible(visible);
+    customLookupHeaderValue.setVisible(visible);
   }
 
   private void restoreLookupProviderSwitches() {
