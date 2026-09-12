@@ -21,6 +21,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -75,10 +76,18 @@ public final class CallNoteDialogFragment extends DialogFragment {
   @NonNull
   @Override
   public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-    Context context = requireContext();
+    // In-call UI is a dark activity with light text. AlertDialog's panel is
+    // light; an EditText built from the activity theme keeps white text and
+    // becomes invisible. Theme the whole dialog (and the field) for DayNight
+    // dialog colors instead.
+    Context dialogContext =
+        new ContextThemeWrapper(
+            requireContext(),
+            androidx.appcompat.R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+
     Bundle args = requireArguments();
 
-    editText = new EditText(context);
+    editText = new EditText(dialogContext);
     editText.setHint(R.string.call_details_note_hint);
     editText.setInputType(
         InputType.TYPE_CLASS_TEXT
@@ -87,6 +96,10 @@ public final class CallNoteDialogFragment extends DialogFragment {
     editText.setMinLines(3);
     editText.setMaxLines(8);
     editText.setGravity(android.view.Gravity.TOP | android.view.Gravity.START);
+    editText.setTextColor(attrColor(dialogContext, android.R.attr.textColorPrimary, 0xFF212121));
+    editText.setHintTextColor(attrColor(dialogContext, android.R.attr.textColorHint, 0xFF757575));
+    editText.setBackgroundColor(
+        attrColor(dialogContext, android.R.attr.colorBackgroundFloating, 0xFFFFFFFF));
     if (savedInstanceState == null) {
       String note = args.getString(ARG_NOTE);
       if (note != null) {
@@ -95,20 +108,20 @@ public final class CallNoteDialogFragment extends DialogFragment {
       } else {
         // Opened without the note in hand - the in-call screen does this, because it has no reason
         // to have read the store. Fill it in when it arrives, unless the user has started typing.
-        prefillFromStore(context, args.getString(ARG_CALL_NOTE_ID));
+        prefillFromStore(dialogContext, args.getString(ARG_CALL_NOTE_ID));
       }
     }
 
     int padding =
         (int)
             TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 20, context.getResources().getDisplayMetrics());
-    FrameLayout container = new FrameLayout(context);
+                TypedValue.COMPLEX_UNIT_DIP, 20, dialogContext.getResources().getDisplayMetrics());
+    FrameLayout container = new FrameLayout(dialogContext);
     container.setPaddingRelative(padding, padding / 2, padding, 0);
     container.addView(editText);
 
     AlertDialog dialog =
-        new AlertDialog.Builder(context)
+        new AlertDialog.Builder(dialogContext)
             .setTitle(R.string.call_details_note_title)
             .setView(container)
             .setPositiveButton(R.string.call_details_note_save, (d, which) -> save())
@@ -118,6 +131,17 @@ public final class CallNoteDialogFragment extends DialogFragment {
         .getWindow()
         .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     return dialog;
+  }
+
+  private static int attrColor(Context context, int attr, int fallback) {
+    TypedValue value = new TypedValue();
+    if (!context.getTheme().resolveAttribute(attr, value, true)) {
+      return fallback;
+    }
+    if (value.resourceId != 0) {
+      return ContextCompat.getColor(context, value.resourceId);
+    }
+    return value.data;
   }
 
   private void prefillFromStore(Context context, String callNoteId) {
