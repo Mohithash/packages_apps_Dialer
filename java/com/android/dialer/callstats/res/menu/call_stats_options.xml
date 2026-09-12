@@ -39,4 +39,9 @@
     android:title="@string/call_stats_sort_by_count"
     app:showAsAction="never" />
 
+  <item
+    android:id="@+id/open_call_insights"
+    android:title="@string/insights_menu"
+    app:showAsAction="never" />
+
 </menu>

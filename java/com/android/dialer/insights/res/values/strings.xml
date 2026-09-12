@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="insights_title">Call insights</string>
+    <string name="insights_loading">Loading…</string>
+    <string name="insights_summary_fmt">%1$d calls · %2$d min talk · %3$d missed</string>
+    <string name="insights_row_fmt">%1$s · %2$s · score %3$d · %4$d days ago · %5$d calls</string>
+    <string name="insights_privacy">Numbers stay on this phone. Only short totals go to your brain endpoint.</string>
+    <string name="insights_brain_button">Summarise with BestROM brain</string>
+    <string name="insights_brain_working">Asking the brain…</string>
+    <string name="insights_brain_not_ready">Set the brain in BestROM Agent first (and unlock the phone).</string>
+    <string name="insights_brain_failed">Could not get a narrative.</string>
+    <string name="insights_menu">Call insights</string>
+    <string name="schedule_followup">Schedule follow-up</string>
+    <string name="schedule_followup_title">Call back: %1$s</string>
+    <string name="schedule_followup_ok">Scheduled</string>
+    <string name="schedule_followup_fail">Could not schedule (%1$s)</string>
+    <string name="schedule_followup_confirm">Add a 30-minute calendar event tomorrow at 10:00 to call this person?</string>
+    <string-array name="insights_periods">
+        <item>Today</item>
+        <item>Last 7 days</item>
+        <item>Last 30 days</item>
+    </string-array>
+</resources>

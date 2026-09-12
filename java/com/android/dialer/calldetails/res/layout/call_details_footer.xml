@@ -48,6 +48,16 @@
       app:drawableTint="?colorIcon" />
 
   <TextView
+      android:id="@+id/call_detail_action_schedule_followup"
+      style="@style/CallDetailsActionItemStyle"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:tint="?colorIcon"
+      android:text="@string/schedule_followup"
+      app:drawableStartCompat="@drawable/quantum_ic_edit_vd_theme_24"
+      app:drawableTint="?colorIcon" />
+
+  <TextView
       android:id="@+id/call_detail_action_report_caller_id"
       style="@style/CallDetailsActionItemStyle"
       android:layout_width="match_parent"

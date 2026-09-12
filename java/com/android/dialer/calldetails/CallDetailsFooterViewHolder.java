@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.dialer.R;
 import com.android.dialer.clipboard.ClipboardUtils;
 import com.android.dialer.common.Assert;
+import com.android.dialer.insights.ScheduleFollowUpHelper;
 import com.android.dialer.util.CallUtil;
 import com.android.dialer.util.DialerUtils;
 
@@ -38,6 +39,7 @@ final class CallDetailsFooterViewHolder extends RecyclerView.ViewHolder implemen
   private final DeleteCallDetailsListener deleteCallDetailsListener;
   private final View copy;
   private final View edit;
+  private final View schedule;
   private final View reportCallerId;
   private final View delete;
 
@@ -52,10 +54,12 @@ final class CallDetailsFooterViewHolder extends RecyclerView.ViewHolder implemen
     this.deleteCallDetailsListener = deleteCallDetailsListener;
     copy = view.findViewById(R.id.call_detail_action_copy);
     edit = view.findViewById(R.id.call_detail_action_edit_before_call);
+    schedule = view.findViewById(R.id.call_detail_action_schedule_followup);
     reportCallerId = view.findViewById(R.id.call_detail_action_report_caller_id);
     delete = view.findViewById(R.id.call_detail_action_delete);
     copy.setOnClickListener(this);
     edit.setOnClickListener(this);
+    schedule.setOnClickListener(this);
     reportCallerId.setOnClickListener(this);
     delete.setOnClickListener(this);
   }
@@ -65,6 +69,7 @@ final class CallDetailsFooterViewHolder extends RecyclerView.ViewHolder implemen
     if (TextUtils.isEmpty(number)) {
       copy.setVisibility(View.GONE);
       edit.setVisibility(View.GONE);
+      schedule.setVisibility(View.GONE);
     } else if (reportCallIdListener.canReportCallerId(number)) {
       reportCallerId.setVisibility(View.VISIBLE);
     }
@@ -78,6 +83,8 @@ final class CallDetailsFooterViewHolder extends RecyclerView.ViewHolder implemen
     } else if (view == edit) {
       Intent dialIntent = new Intent(Intent.ACTION_DIAL, CallUtil.getCallUri(number));
       DialerUtils.startActivityWithErrorToast(context, dialIntent);
+    } else if (view == schedule) {
+      ScheduleFollowUpHelper.confirmAndSchedule(context, number);
     } else if (view == reportCallerId) {
       reportCallIdListener.reportCallId(number);
     } else if (view == delete) {

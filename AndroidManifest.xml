@@ -45,6 +45,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.bestrom.agent.permission.USE_BRAIN" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -134,6 +135,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".insights.InsightsActivity"
+            android:exported="false"
+            android:label="@string/insights_title"
+            android:theme="@style/Dialer.ThemeBase.NoActionBar" />
 
         <service
             android:name="com.android.dialer.callrecord.impl.CallRecorderService"

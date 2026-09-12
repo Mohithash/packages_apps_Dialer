@@ -20,6 +20,7 @@ package com.android.dialer.callstats;
 
 import static android.Manifest.permission.READ_CALL_LOG;
 
+import android.content.Intent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.ContentObserver;
@@ -48,6 +49,7 @@ import com.android.dialer.R;
 import com.android.dialer.app.contactinfo.ExpirableCacheHeadlessFragment;
 import com.android.dialer.calllogutils.FilterSpinnerHelper;
 import com.android.dialer.contacts.ContactsComponent;
+import com.android.dialer.insights.InsightsActivity;
 import com.android.dialer.phonenumbercache.ContactInfo;
 import com.android.dialer.util.PermissionsUtil;
 import com.android.dialer.widget.EmptyContentView;
@@ -175,6 +177,8 @@ public class CallStatsFragment extends Fragment implements
       mSortByDuration = itemId == R.id.sort_by_duration;
       mAdapter.updateDisplayedData(mCallTypeFilter, mSortByDuration);
       requireActivity().invalidateOptionsMenu();
+    } else if (itemId == R.id.open_call_insights) {
+      startActivity(new Intent(requireActivity(), InsightsActivity.class));
     }
     return true;
   }
