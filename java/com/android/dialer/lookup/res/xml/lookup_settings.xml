@@ -61,12 +61,61 @@
         android:dialogMessage="@string/custom_lookup_url_dialog"
         app:iconSpaceReserved="false"
         app:useSimpleSummaryProvider="true" />
+    <ListPreference
+        android:dependency="enable_reverse_lookup"
+        android:entries="@array/custom_lookup_method_names"
+        android:entryValues="@array/custom_lookup_methods"
+        android:key="custom_lookup_method"
+        android:persistent="false"
+        android:summary="%s"
+        android:title="@string/custom_lookup_method_title"
+        app:iconSpaceReserved="false" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_body"
+        android:persistent="false"
+        android:title="@string/custom_lookup_body_title"
+        android:dialogMessage="@string/custom_lookup_body_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
     <EditTextPreference
         android:dependency="enable_reverse_lookup"
         android:key="custom_lookup_name_path"
         android:persistent="false"
         android:title="@string/custom_lookup_name_path_title"
         android:dialogMessage="@string/custom_lookup_name_path_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_address_path"
+        android:persistent="false"
+        android:title="@string/custom_lookup_address_path_title"
+        android:dialogMessage="@string/custom_lookup_address_path_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_image_path"
+        android:persistent="false"
+        android:title="@string/custom_lookup_image_path_title"
+        android:dialogMessage="@string/custom_lookup_image_path_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_gender_path"
+        android:persistent="false"
+        android:title="@string/custom_lookup_gender_path_title"
+        android:dialogMessage="@string/custom_lookup_gender_path_dialog"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        android:dependency="enable_reverse_lookup"
+        android:key="custom_lookup_birthday_path"
+        android:persistent="false"
+        android:title="@string/custom_lookup_birthday_path_title"
+        android:dialogMessage="@string/custom_lookup_birthday_path_dialog"
         app:iconSpaceReserved="false"
         app:useSimpleSummaryProvider="true" />
     <EditTextPreference

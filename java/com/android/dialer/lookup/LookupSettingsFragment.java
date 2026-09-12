@@ -37,7 +37,13 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
   private static final String KEY_FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider";
   private static final String KEY_REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider";
   private static final String KEY_CUSTOM_LOOKUP_URL = "custom_lookup_url";
+  private static final String KEY_CUSTOM_LOOKUP_METHOD = "custom_lookup_method";
+  private static final String KEY_CUSTOM_LOOKUP_BODY = "custom_lookup_body";
   private static final String KEY_CUSTOM_LOOKUP_NAME_PATH = "custom_lookup_name_path";
+  private static final String KEY_CUSTOM_LOOKUP_ADDRESS_PATH = "custom_lookup_address_path";
+  private static final String KEY_CUSTOM_LOOKUP_IMAGE_PATH = "custom_lookup_image_path";
+  private static final String KEY_CUSTOM_LOOKUP_GENDER_PATH = "custom_lookup_gender_path";
+  private static final String KEY_CUSTOM_LOOKUP_BIRTHDAY_PATH = "custom_lookup_birthday_path";
   private static final String KEY_CUSTOM_LOOKUP_HEADER_NAME = "custom_lookup_header_name";
   private static final String KEY_CUSTOM_LOOKUP_HEADER_VALUE = "custom_lookup_header_value";
 
@@ -46,7 +52,13 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
   private ListPreference forwardLookupProvider;
   private ListPreference reverseLookupProvider;
   private EditTextPreference customLookupUrl;
+  private ListPreference customLookupMethod;
+  private EditTextPreference customLookupBody;
   private EditTextPreference customLookupNamePath;
+  private EditTextPreference customLookupAddressPath;
+  private EditTextPreference customLookupImagePath;
+  private EditTextPreference customLookupGenderPath;
+  private EditTextPreference customLookupBirthdayPath;
   private EditTextPreference customLookupHeaderName;
   private EditTextPreference customLookupHeaderValue;
 
@@ -73,11 +85,23 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
     reverseLookupProvider.setOnPreferenceChangeListener(this);
 
     customLookupUrl = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_URL);
+    customLookupMethod = (ListPreference) findPreference(KEY_CUSTOM_LOOKUP_METHOD);
+    customLookupBody = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_BODY);
     customLookupNamePath = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_NAME_PATH);
+    customLookupAddressPath = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_ADDRESS_PATH);
+    customLookupImagePath = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_IMAGE_PATH);
+    customLookupGenderPath = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_GENDER_PATH);
+    customLookupBirthdayPath = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_BIRTHDAY_PATH);
     customLookupHeaderName = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_HEADER_NAME);
     customLookupHeaderValue = (EditTextPreference) findPreference(KEY_CUSTOM_LOOKUP_HEADER_VALUE);
     customLookupUrl.setOnPreferenceChangeListener(this);
+    customLookupMethod.setOnPreferenceChangeListener(this);
+    customLookupBody.setOnPreferenceChangeListener(this);
     customLookupNamePath.setOnPreferenceChangeListener(this);
+    customLookupAddressPath.setOnPreferenceChangeListener(this);
+    customLookupImagePath.setOnPreferenceChangeListener(this);
+    customLookupGenderPath.setOnPreferenceChangeListener(this);
+    customLookupBirthdayPath.setOnPreferenceChangeListener(this);
     customLookupHeaderName.setOnPreferenceChangeListener(this);
     customLookupHeaderValue.setOnPreferenceChangeListener(this);
   }
@@ -106,8 +130,20 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
       showCustomLookupSettings(LookupSettings.RLP_CUSTOM.equals(newValue));
     } else if (preference == customLookupUrl) {
       LookupSettings.setCustomLookupUrl(context, (String) newValue);
+    } else if (preference == customLookupMethod) {
+      LookupSettings.setCustomLookupMethod(context, (String) newValue);
+    } else if (preference == customLookupBody) {
+      LookupSettings.setCustomLookupBody(context, (String) newValue);
     } else if (preference == customLookupNamePath) {
       LookupSettings.setCustomLookupNamePath(context, (String) newValue);
+    } else if (preference == customLookupAddressPath) {
+      LookupSettings.setCustomLookupAddressPath(context, (String) newValue);
+    } else if (preference == customLookupImagePath) {
+      LookupSettings.setCustomLookupImagePath(context, (String) newValue);
+    } else if (preference == customLookupGenderPath) {
+      LookupSettings.setCustomLookupGenderPath(context, (String) newValue);
+    } else if (preference == customLookupBirthdayPath) {
+      LookupSettings.setCustomLookupBirthdayPath(context, (String) newValue);
     } else if (preference == customLookupHeaderName) {
       LookupSettings.setCustomLookupHeaderName(context, (String) newValue);
     } else if (preference == customLookupHeaderValue) {
@@ -120,7 +156,13 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
   private void restoreCustomLookupSettings() {
     Context context = getContext();
     customLookupUrl.setText(LookupSettings.getCustomLookupUrl(context));
+    customLookupMethod.setValue(LookupSettings.getCustomLookupMethod(context));
+    customLookupBody.setText(LookupSettings.getCustomLookupBody(context));
     customLookupNamePath.setText(LookupSettings.getCustomLookupNamePath(context));
+    customLookupAddressPath.setText(LookupSettings.getCustomLookupAddressPath(context));
+    customLookupImagePath.setText(LookupSettings.getCustomLookupImagePath(context));
+    customLookupGenderPath.setText(LookupSettings.getCustomLookupGenderPath(context));
+    customLookupBirthdayPath.setText(LookupSettings.getCustomLookupBirthdayPath(context));
     customLookupHeaderName.setText(LookupSettings.getCustomLookupHeaderName(context));
     customLookupHeaderValue.setText(LookupSettings.getCustomLookupHeaderValue(context));
     showCustomLookupSettings(
@@ -130,7 +172,13 @@ public class LookupSettingsFragment extends PreferenceFragmentCompat
   /** The endpoint settings mean nothing unless the custom provider is the one selected. */
   private void showCustomLookupSettings(boolean visible) {
     customLookupUrl.setVisible(visible);
+    customLookupMethod.setVisible(visible);
+    customLookupBody.setVisible(visible);
     customLookupNamePath.setVisible(visible);
+    customLookupAddressPath.setVisible(visible);
+    customLookupImagePath.setVisible(visible);
+    customLookupGenderPath.setVisible(visible);
+    customLookupBirthdayPath.setVisible(visible);
     customLookupHeaderName.setVisible(visible);
     customLookupHeaderValue.setVisible(visible);
   }

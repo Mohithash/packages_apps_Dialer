@@ -38,4 +38,14 @@
         <item>ZabaSearch (US)</item>
         <item>Custom endpoint</item>
     </string-array>
+
+    <string-array name="custom_lookup_methods" translatable="false">
+        <item>GET</item>
+        <item>POST</item>
+    </string-array>
+
+    <string-array name="custom_lookup_method_names" translatable="false">
+        <item>GET</item>
+        <item>POST</item>
+    </string-array>
 </resources>

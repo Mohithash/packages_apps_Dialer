@@ -42,9 +42,19 @@ public final class LookupSettings {
   private static final String FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider2";
   private static final String REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider2";
   private static final String CUSTOM_LOOKUP_URL = "custom_lookup_url";
+  private static final String CUSTOM_LOOKUP_METHOD = "custom_lookup_method";
+  private static final String CUSTOM_LOOKUP_BODY = "custom_lookup_body";
   private static final String CUSTOM_LOOKUP_HEADER_NAME = "custom_lookup_header_name";
   private static final String CUSTOM_LOOKUP_HEADER_VALUE = "custom_lookup_header_value";
   private static final String CUSTOM_LOOKUP_NAME_PATH = "custom_lookup_name_path";
+  private static final String CUSTOM_LOOKUP_ADDRESS_PATH = "custom_lookup_address_path";
+  private static final String CUSTOM_LOOKUP_IMAGE_PATH = "custom_lookup_image_path";
+  private static final String CUSTOM_LOOKUP_GENDER_PATH = "custom_lookup_gender_path";
+  private static final String CUSTOM_LOOKUP_BIRTHDAY_PATH = "custom_lookup_birthday_path";
+
+  /** HTTP methods the custom lookup may use. */
+  public static final String CUSTOM_LOOKUP_METHOD_GET = "GET";
+  public static final String CUSTOM_LOOKUP_METHOD_POST = "POST";
 
   private LookupSettings() {
   }
@@ -100,6 +110,28 @@ public final class LookupSettings {
     getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_URL, value).apply();
   }
 
+  /** HTTP method for the custom endpoint: {@link #CUSTOM_LOOKUP_METHOD_GET} or POST. */
+  public static String getCustomLookupMethod(Context context) {
+    return getSharedPreferences(context)
+        .getString(CUSTOM_LOOKUP_METHOD, CUSTOM_LOOKUP_METHOD_GET);
+  }
+
+  public static void setCustomLookupMethod(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_METHOD, value).apply();
+  }
+
+  /**
+   * Optional request body template for POST. Placeholders {@code {number}} / {@code
+   * {number_plain}} are substituted without URL encoding so JSON bodies stay valid.
+   */
+  public static String getCustomLookupBody(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_BODY, null);
+  }
+
+  public static void setCustomLookupBody(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_BODY, value).apply();
+  }
+
   /** Name of the one header the custom lookup sends, e.g. "Authorization". */
   public static String getCustomLookupHeaderName(Context context) {
     return getSharedPreferences(context).getString(CUSTOM_LOOKUP_HEADER_NAME, null);
@@ -128,5 +160,53 @@ public final class LookupSettings {
 
   public static void setCustomLookupNamePath(Context context, String value) {
     getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_NAME_PATH, value).apply();
+  }
+
+  /**
+   * Optional dotted path to an address string in the reply. Empty means skip. Defaults match a
+   * flat official shape ({@code address}); use {@code data.address} when the service wraps fields.
+   */
+  public static String getCustomLookupAddressPath(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_ADDRESS_PATH, "address");
+  }
+
+  public static void setCustomLookupAddressPath(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_ADDRESS_PATH, value).apply();
+  }
+
+  /**
+   * Optional dotted path to a https photo URL in the reply. Empty means skip. Default {@code
+   * image}.
+   */
+  public static String getCustomLookupImagePath(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_IMAGE_PATH, "image");
+  }
+
+  public static void setCustomLookupImagePath(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_IMAGE_PATH, value).apply();
+  }
+
+  /**
+   * Optional dotted path to gender in the reply. Shown on the location line with birthday when
+   * set. Default {@code gender}.
+   */
+  public static String getCustomLookupGenderPath(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_GENDER_PATH, "gender");
+  }
+
+  public static void setCustomLookupGenderPath(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_GENDER_PATH, value).apply();
+  }
+
+  /**
+   * Optional dotted path to birthday in the reply. Shown on the location line with gender when
+   * set. Default {@code birthday}.
+   */
+  public static String getCustomLookupBirthdayPath(Context context) {
+    return getSharedPreferences(context).getString(CUSTOM_LOOKUP_BIRTHDAY_PATH, "birthday");
+  }
+
+  public static void setCustomLookupBirthdayPath(Context context, String value) {
+    getSharedPreferences(context).edit().putString(CUSTOM_LOOKUP_BIRTHDAY_PATH, value).apply();
   }
 }

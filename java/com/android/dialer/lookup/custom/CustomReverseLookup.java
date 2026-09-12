@@ -16,9 +16,13 @@
 
 package com.android.dialer.lookup.custom;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.dialer.common.LogUtil;
 import com.android.dialer.lookup.ContactBuilder;
@@ -31,16 +35,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Looks a number up through an endpoint the user configured.
  *
- * <p>BestROM ships no endpoint and no credential: the user supplies both, so the service they use
- * is between them and that service. The request is a plain GET of the configured URL with
- * {@code {number}} substituted, optionally carrying one header, and the reply is read as JSON.
+ * <p>BestROM ships no endpoint and no credential: the user supplies both. Supports GET or POST
+ * over https, an optional JSON/form body template, one auth header, and dotted JSON paths for
+ * name, address, image, gender and birthday. Placeholders {@code {number}} and {@code
+ * {number_plain}} work in the URL and in the body.
  */
 public class CustomReverseLookup extends ReverseLookup {
 
@@ -53,6 +61,35 @@ public class CustomReverseLookup extends ReverseLookup {
   private static final String PLACEHOLDER_NUMBER_PLAIN = "{number_plain}";
 
   public CustomReverseLookup(Context context) {}
+
+  @Override
+  public Bitmap lookupImage(Context context, Uri uri) {
+    if (uri == null) {
+      return null;
+    }
+
+    String scheme = uri.getScheme();
+    if (scheme != null && scheme.startsWith("http")) {
+      if (!"https".equals(scheme)) {
+        LogUtil.w(TAG + ".lookupImage", "refusing a non-https photo URL");
+        return null;
+      }
+      try {
+        byte[] response = LookupUtils.httpGetBytes(uri.toString(), null);
+        return BitmapFactory.decodeByteArray(response, 0, response.length);
+      } catch (IOException e) {
+        Log.e(TAG, "Failed to retrieve image", e);
+      }
+    } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
+      try {
+        return BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
+      } catch (FileNotFoundException e) {
+        Log.e(TAG, "Failed to retrieve image", e);
+      }
+    }
+
+    return null;
+  }
 
   @Override
   public ContactInfo lookupNumber(Context context, String normalizedNumber, String formattedNumber)
@@ -74,19 +111,37 @@ public class CustomReverseLookup extends ReverseLookup {
 
     String plain = normalizedNumber.startsWith("+") ? normalizedNumber.substring(1)
         : normalizedNumber;
+    // URL placeholders are percent-encoded; body placeholders are not (JSON must stay intact).
     String requestUrl =
         url.replace(PLACEHOLDER_NUMBER, Uri.encode(normalizedNumber))
             .replace(PLACEHOLDER_NUMBER_PLAIN, Uri.encode(plain));
 
-    Map<String, String> headers = null;
+    Map<String, String> headers = new HashMap<>();
     String headerName = LookupSettings.getCustomLookupHeaderName(context);
     String headerValue = LookupSettings.getCustomLookupHeaderValue(context);
     if (!TextUtils.isEmpty(headerName) && !TextUtils.isEmpty(headerValue)) {
-      headers = new HashMap<>();
       headers.put(headerName, headerValue);
     }
 
-    String response = LookupUtils.httpGet(requestUrl, headers);
+    String method = LookupSettings.getCustomLookupMethod(context);
+    String bodyTemplate = LookupSettings.getCustomLookupBody(context);
+    String response;
+    if (LookupSettings.CUSTOM_LOOKUP_METHOD_POST.equalsIgnoreCase(method)) {
+      String body = null;
+      if (!TextUtils.isEmpty(bodyTemplate)) {
+        body =
+            bodyTemplate
+                .replace(PLACEHOLDER_NUMBER, normalizedNumber)
+                .replace(PLACEHOLDER_NUMBER_PLAIN, plain);
+      }
+      // Most JSON APIs need this; skip if the user already set Content-Type as their header.
+      if (!headers.containsKey("Content-Type") && !headers.containsKey("content-type")) {
+        headers.put("Content-Type", "application/json; charset=utf-8");
+      }
+      response = LookupUtils.httpPost(requestUrl, headers, body);
+    } else {
+      response = LookupUtils.httpGet(requestUrl, headers.isEmpty() ? null : headers);
+    }
     if (TextUtils.isEmpty(response)) {
       return null;
     }
@@ -96,10 +151,68 @@ public class CustomReverseLookup extends ReverseLookup {
       return null;
     }
 
-    return ContactBuilder.forReverseLookup(normalizedNumber, formattedNumber)
-        .setName(ContactBuilder.Name.createDisplayName(name))
-        .addPhoneNumber(ContactBuilder.PhoneNumber.createMainNumber(formattedNumber))
-        .build();
+    String address = extractOptional(response, LookupSettings.getCustomLookupAddressPath(context));
+    String image = extractOptional(response, LookupSettings.getCustomLookupImagePath(context));
+    String gender = extractOptional(response, LookupSettings.getCustomLookupGenderPath(context));
+    String birthday = extractOptional(response, LookupSettings.getCustomLookupBirthdayPath(context));
+
+    ContactBuilder builder =
+        ContactBuilder.forReverseLookup(normalizedNumber, formattedNumber)
+            .setName(ContactBuilder.Name.createDisplayName(name))
+            .addPhoneNumber(ContactBuilder.PhoneNumber.createMainNumber(formattedNumber));
+
+    if (!TextUtils.isEmpty(address)) {
+      builder.addAddress(ContactBuilder.Address.createFormattedHome(address));
+    }
+
+    if (!TextUtils.isEmpty(image) && image.startsWith("https://")) {
+      builder.setPhotoUri(image);
+    } else if (!TextUtils.isEmpty(image)) {
+      LogUtil.w(TAG + ".lookupNumber", "ignoring a non-https photo URL");
+    }
+
+    ContactInfo info = builder.build();
+    if (info == null) {
+      return null;
+    }
+
+    // Gender and birthday have no Contacts data kind in ContactBuilder; show them on the
+    // location line under the name (same place geo/address often appears in call UI).
+    info.geoDescription = joinDisplayBits(address, gender, birthday);
+    return info;
+  }
+
+  /** Builds "address · gender · birthday", skipping empty parts. */
+  private static String joinDisplayBits(String address, String gender, String birthday) {
+    List<String> parts = new ArrayList<>(3);
+    if (!TextUtils.isEmpty(address)) {
+      parts.add(address);
+    }
+    if (!TextUtils.isEmpty(gender)) {
+      parts.add(gender);
+    }
+    if (!TextUtils.isEmpty(birthday)) {
+      parts.add(birthday);
+    }
+    if (parts.isEmpty()) {
+      return null;
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < parts.size(); i++) {
+      if (i > 0) {
+        sb.append(" · ");
+      }
+      sb.append(parts.get(i));
+    }
+    return sb.toString();
+  }
+
+  /** Like {@link #extract} but treats a blank path as "field not configured". */
+  private static String extractOptional(String response, String path) {
+    if (TextUtils.isEmpty(path)) {
+      return null;
+    }
+    return extract(response, path);
   }
 
   /**
@@ -133,8 +246,8 @@ public class CustomReverseLookup extends ReverseLookup {
       if (node == null || node instanceof JSONObject || node instanceof JSONArray) {
         return null;
       }
-      String name = node.toString().trim();
-      return TextUtils.isEmpty(name) || "null".equals(name) ? null : name;
+      String value = node.toString().trim();
+      return TextUtils.isEmpty(value) || "null".equals(value) ? null : value;
     } catch (JSONException e) {
       LogUtil.w(TAG + ".extract", "the reply was not the JSON the path expects");
       return null;

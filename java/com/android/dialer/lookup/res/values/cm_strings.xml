@@ -33,12 +33,40 @@
     <!-- Title of the setting holding the address of the user's own caller ID service. [CHAR LIMIT=60] -->
     <string name="custom_lookup_url_title">Endpoint</string>
     <!-- Explains what to type as the endpoint address. [CHAR LIMIT=NONE] -->
-    <string name="custom_lookup_url_dialog">The https address to ask, with {number} where the number goes. Use {number_plain} for the number without its leading +.</string>
+    <string name="custom_lookup_url_dialog">The https address to ask. Put {number} or {number_plain} in the URL and/or the POST body. {number} is E.164 with +; {number_plain} drops the +.</string>
+
+    <!-- Title of the HTTP method setting for custom lookup. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_method_title">HTTP method</string>
+
+    <!-- Title of the optional POST body template. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_body_title">Request body</string>
+    <!-- Explains the POST body template. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_body_dialog">Optional. Used with POST. Paste the JSON (or form) body your API wants, with {number} or {number_plain} where the phone goes. Example: {\"phone\":\"{number}\"}. Leave empty for GET or a POST with no body.</string>
 
     <!-- Title of the setting naming where the name sits in the reply. [CHAR LIMIT=60] -->
     <string name="custom_lookup_name_path_title">Name field</string>
     <!-- Explains how to point at the name in the reply. [CHAR LIMIT=NONE] -->
     <string name="custom_lookup_name_path_dialog">Where the name sits in the reply, as a dotted path: name, or data.name, or data.0.name for the first entry of a list.</string>
+
+    <!-- Title of the setting naming where the address sits in the reply. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_address_path_title">Address field</string>
+    <!-- Explains how to point at the address. Leave empty to skip. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_address_path_dialog">Optional. Dotted path to the address string, e.g. address or data.address. Clear the field to ignore address.</string>
+
+    <!-- Title of the setting naming where the photo URL sits in the reply. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_image_path_title">Photo field</string>
+    <!-- Explains how to point at the photo URL. Leave empty to skip. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_image_path_dialog">Optional. Dotted path to a https photo URL, e.g. image or data.image. Clear the field to ignore photos.</string>
+
+    <!-- Title of the setting naming where gender sits in the reply. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_gender_path_title">Gender field</string>
+    <!-- Explains how to point at gender. Leave empty to skip. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_gender_path_dialog">Optional. Dotted path to gender, e.g. gender or data.gender. Shown under the name with birthday when present. Clear to ignore.</string>
+
+    <!-- Title of the setting naming where birthday sits in the reply. [CHAR LIMIT=60] -->
+    <string name="custom_lookup_birthday_path_title">Birthday field</string>
+    <!-- Explains how to point at birthday. Leave empty to skip. [CHAR LIMIT=NONE] -->
+    <string name="custom_lookup_birthday_path_dialog">Optional. Dotted path to birthday, e.g. birthday or data.birthday. Shown under the name with gender when present. Clear to ignore.</string>
 
     <!-- Title of the setting holding the name of the header the lookup sends. [CHAR LIMIT=60] -->
     <string name="custom_lookup_header_name_title">Header name</string>
